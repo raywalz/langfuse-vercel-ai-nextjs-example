@@ -1,5 +1,5 @@
-import { openai } from '@ai-sdk/openai';
-import { convertToCoreMessages, streamText } from 'ai';
+import { openai } from "@ai-sdk/openai";
+import { convertToCoreMessages, streamText } from "ai";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -13,14 +13,17 @@ export async function POST(req: Request) {
 
   // Call the language model
   const result = await streamText({
-    model: openai('gpt-4-turbo'),
+    model: openai("gpt-4-turbo"),
+    experimental_telemetry: {
+      isEnabled: true,
+    },
     messages: [
       ...convertToCoreMessages(initialMessages),
       {
-        role: 'user',
+        role: "user",
         content: [
-          { type: 'text', text: currentMessage.content },
-          { type: 'image', image: new URL(data.imageUrl) },
+          { type: "text", text: currentMessage.content },
+          { type: "image", image: new URL(data.imageUrl) },
         ],
       },
     ],

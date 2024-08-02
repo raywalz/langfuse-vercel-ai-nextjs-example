@@ -1,5 +1,5 @@
-import { openai } from '@ai-sdk/openai';
-import { StreamData, streamText } from 'ai';
+import { openai } from "@ai-sdk/openai";
+import { StreamData, streamText } from "ai";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -9,13 +9,16 @@ export async function POST(req: Request) {
 
   // optional: use stream data
   const data = new StreamData();
-  data.append('initialized call');
+  data.append("initialized call");
 
   const result = await streamText({
-    model: openai('gpt-4-turbo'),
+    model: openai("gpt-4-turbo"),
     messages,
+    experimental_telemetry: {
+      isEnabled: true,
+    },
     onFinish() {
-      data.append('call completed');
+      data.append("call completed");
       data.close();
     },
   });

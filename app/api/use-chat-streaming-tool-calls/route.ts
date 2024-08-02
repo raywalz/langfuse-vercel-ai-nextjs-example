@@ -1,6 +1,6 @@
-import { openai } from '@ai-sdk/openai';
-import { convertToCoreMessages, streamText } from 'ai';
-import { z } from 'zod';
+import { openai } from "@ai-sdk/openai";
+import { convertToCoreMessages, streamText } from "ai";
+import { z } from "zod";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -9,19 +9,22 @@ export async function POST(req: Request) {
   const { messages } = await req.json();
 
   const result = await streamText({
-    model: openai('gpt-4-turbo'),
+    model: openai("gpt-4-turbo"),
     messages: convertToCoreMessages(messages),
+    experimental_telemetry: {
+      isEnabled: true,
+    },
     experimental_toolCallStreaming: true,
     system:
-      'You are a helpful assistant that answers questions about the weather in a given city.' +
-      'You use the showWeatherInformation tool to show the weather information to the user instead of talking about it.',
+      "You are a helpful assistant that answers questions about the weather in a given city." +
+      "You use the showWeatherInformation tool to show the weather information to the user instead of talking about it.",
     tools: {
       // server-side tool with execute function:
       getWeatherInformation: {
-        description: 'show the weather in a given city to the user',
+        description: "show the weather in a given city to the user",
         parameters: z.object({ city: z.string() }),
         execute: async ({}: { city: string }) => {
-          const weatherOptions = ['sunny', 'cloudy', 'rainy', 'snowy', 'windy'];
+          const weatherOptions = ["sunny", "cloudy", "rainy", "snowy", "windy"];
           return {
             weather:
               weatherOptions[Math.floor(Math.random() * weatherOptions.length)],
@@ -32,7 +35,7 @@ export async function POST(req: Request) {
       // client-side tool that displays whether information to the user:
       showWeatherInformation: {
         description:
-          'Show the weather information to the user. Always use this tool to tell weather information to the user.',
+          "Show the weather information to the user. Always use this tool to tell weather information to the user.",
         parameters: z.object({
           city: z.string(),
           weather: z.string(),
@@ -40,7 +43,7 @@ export async function POST(req: Request) {
           typicalWeather: z
             .string()
             .describe(
-              '2-3 sentences about the typical weather in the city during spring.',
+              "2-3 sentences about the typical weather in the city during spring."
             ),
         }),
       },
